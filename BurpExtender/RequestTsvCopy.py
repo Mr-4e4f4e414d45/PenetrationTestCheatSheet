@@ -14,7 +14,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IRequestInfo, IParameter)
         sys.stdout = callbacks.getStdout()
         self.callbacks = callbacks
         self.helpers = callbacks.getHelpers()
-        self.callbacks.setExtensionName("Request Copy Tsv")
+        self.callbacks.setExtensionName("RequestCopyTsv")
         callbacks.registerContextMenuFactory(self)
 
         return
@@ -22,7 +22,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IRequestInfo, IParameter)
     def createMenuItems(self, invocation):
         self.context = invocation
         menuList = []
-        menuItem = JMenuItem("Request Tsv Copy [URL/QueryString]", actionPerformed=self.getUrlAndQueryString)
+        menuItem = JMenuItem("RequestTsvCopy [URL/QueryString]", actionPerformed=self.getUrlAndQueryString)
         menuList.append(menuItem)
 
         return menuList
@@ -36,25 +36,28 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IRequestInfo, IParameter)
             response = reqResp.getResponse()
 
         requestInfo = self.helpers.analyzeRequest(request)
-        bodyInfo = self.helpers.bytesToString(request)
 
         parameters = requestInfo.getParameters()
         paramlist = []
         for parameter in parameters:
-            if parameter.getType() == IParameter.PARAM_BODY or parameter.getType() == IParameter.PARAM_URL:
+            if parameter.getType() == IParameter.PARAM_BODY or parameter.getType() == IParameter.PARAM_URL or parameter.getType() == IParameter.PARAM_JSON:
 
                 paramInfo = {}
                 if parameter.getType() == IParameter.PARAM_BODY:
                     paramInfo["type"] = "BODY"
+                
                 if parameter.getType() == IParameter.PARAM_URL:
                     paramInfo["type"] = "URL"
+                
+                if parameter.getType() == IParameter.PARAM_JSON:
+                    paramInfo['type'] = "JSON"
 
                 paramInfo["name"] = parameter.getName()
                 paramInfo["value"] = parameter.getValue()
                 paramlist.append(paramInfo)
 
         clipboardInfo = {}
-        clipboardInfo["url"] = self.createUrl(bodyInfo, url)
+        clipboardInfo["url"] = url
         clipboardInfo["paramInfo"] = paramlist
         
         tsvFormat = self.createTsvFormat(clipboardInfo)
@@ -63,23 +66,14 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IRequestInfo, IParameter)
         clipboard = toolkit.getSystemClipboard()
         clipboard.setContents(StringSelection(tsvFormat), None)
 
-    def createUrl(self, bodyInfo, url):
-        protocol = url.getProtocol()
-        host = url.getHost()
-        uriAndQueryString = bodyInfo.split()   
-        url = protocol + "://" + host + uriAndQueryString[1]
-
-        return url
-
     def createTsvFormat(self, paramInfo):
         temp = ""
         for param in paramInfo["paramInfo"]:
-            temp += "\t" + str(param["type"])
-            temp += "\t" + str(param["name"])
-            temp += "\t" + str(param["value"]) 
+            temp += "\t" + str(param["type"].encode('utf-8'))
+            temp += "\t" + str(param["name"].encode('utf-8'))
+            temp += "\t" + str(param["value"].encode('utf-8')) 
             temp += "\r\n"
 
         tsvFormat = "{}\r\n{}".format(paramInfo["url"], temp)
 
         return str(tsvFormat)
-
