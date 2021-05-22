@@ -2306,6 +2306,8 @@ https://github.com/offensive-security/exploitdb-bin-sploits/tree/master/bin-splo
 
 https://github.com/swisskyrepo/PayloadsAllTheThings
 
+https://ismailtasdelen.medium.com/sql-injection-payload-list-b97656cfd66b
+
 # 免責事項
 本記事は情報セキュリティにおける攻撃の理解、防衛のスキル向上を目的としたセキュリティに関する内容がございます。本記事の内容を使用し発生した如何なる損害や損失について、当記事作成者は一切の責任を負いません。
 本記事の内容を実際に使用して、第三者の個人や組織などを攻撃した場合は 法律により罰せられる可能性がありので、必ず自身が所有している環境のみを 対象とし、他人や組織が所有している環境は決して対象としないようお願いします。
